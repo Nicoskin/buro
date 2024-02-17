@@ -21,4 +21,12 @@ QPSK(временной) после свёртки
 
 Глазковая диаграмма
 
-<img src="./photo/5.png" width="400" />   
+<img src="./photo/5.png" width="400" />
+
+Gardner Timing Error Detector - выбираем семпл который пересекает график в нуле (2)
+
+<img src="./photo/TED_gardner.png" width="400" />
+
+Выбираем этот семпл, пока вручную, в дальнейшем это сделает фильтр 
+
+<img src="./photo/sync_qpsk.png" width="400" />
