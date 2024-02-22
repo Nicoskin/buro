@@ -1,5 +1,5 @@
 import scipy. io as sp
-from context import QAM256, QAM64, QAM16, QPSK, randomDataGenerator, plot_QAM, text_from_bits, text_to_bits
+
 import matplotlib.pyplot as plt
 import numpy as np
 import math
@@ -41,7 +41,7 @@ def TED1(data): #original ted
 def TED_loop_filter(data): #ted loop filter 
     BnTs = 0.01 
     Nsps = 10
-    C = np.sqrt(2)/2
+    C = np.sqrt(2)
     Kp = 1
     teta = ((BnTs)/(Nsps))/(C + 1/(4*C))
     K1 = (-4*C*teta)/((1+2*C*teta+teta**2)*Kp)
@@ -153,7 +153,7 @@ nn_start = round(Ns / 5)
 nn_end = Ns - round(Ns / 5)
 nn = np.arange(nn_start, nn_end)
 
-plt.scatter(new_data[600:].real, new_data[600:].imag)
+plt.scatter(new_data[800:].real, new_data[800:].imag)
 
 
 plt.show()
