@@ -67,7 +67,8 @@ def TED_loop_filter(data): #ted loop filter
         #imag = (data.imag[ns+n] - data.imag[nsp+ns+n]) * data.imag[n+(nsp)//2+ns]
         real = (data.real[nsp+ns+n] - data.real[ns+n]) * data.real[n + (nsp)//2+ns]
         imag = (data.imag[nsp+ns+n] - data.imag[ns+n] ) * data.imag[n + (nsp)//2+ns]
-        err[ns//nsp] = real + imag
+        err[ns//nsp] = np.mean(real + imag)
+        #err[ns//nsp] = np.mean((np.conj(data[nsp+ns+n]) - np.conj(data[ns+n]))*(data[n + (nsp)//2+ns])) 
         error = err.real[ns//nsp]
         p1 = error * K1
         p2 = p2 + p1 + error * K2
@@ -123,7 +124,7 @@ rxSymbols = rxConvolve[maxe::10] # типа TED
 
 ml.cool_plot(rxАfterTED, title="rxАfterTED")
 ml.cool_plot(Ted_index, title="Ted_index")
-ml.cool_plot(rx, title="Rx signal")
+ml.cool_scatter(rx, title="Rx signal")
 # ml.cool_plot(rxConvolve, title="После свёртки")
 # ml.cool_plot(rxClear, title="Повёрнутый")
 
