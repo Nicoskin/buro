@@ -3,7 +3,8 @@ import matplotlib.pyplot as plt
 import mylib as ml
 import mylib.test as mlt
 
-rx = np.load("") # Прописать свой путь к файлу
+# TODO: протестировать при передаче с одной сдр на другую
+rx = np.load("") # Прописать свой путь к файлу 
 rxMax = max(rx.real)
 rx = rx / rxMax # Нормировка
 symbolLength = 10 
