@@ -17,10 +17,10 @@ signalRepeat = np.repeat(sigQpsk, 10) # 1770 сэмпла
 ###
 ### Работа с SDR
 ###
-sdr = ml.sdr_settings("ip:192.168.3.1", 1900e6, 1000, 1e6, 0, 20) # type: ignore
-sdr2 = ml.sdr_settings("ip:192.168.2.1", 1900e6, 1000, 1e6, 0, 20) # type: ignore
-ml.tx_sig(sdr2,signalRepeat) 
-rx = ml.rx_cycles_buffer(sdr, 100) # берёт 4000 отсчётов
+sdr = ml.sdr_settings("ip:192.168.3.1", 1900e6, 1000, 1e6, 0, 20, 'manual') # type: ignore
+sdr2 = ml.sdr_settings("ip:192.168.2.1", 1900e6, 1000, 1e6, 0, 20,'manual') # type: ignore
+ml.tx_sig(sdr,signalRepeat) 
+rx = ml.rx_cycles_buffer(sdr2, 100) # берёт 4000 отсчётов
 rxMax = max(rx.real)
 rx = rx / rxMax # Нормировка
 
@@ -29,18 +29,17 @@ rxConvolve = np.convolve(rx, np.ones(symbolLength)) / 10 # Свёртка
 
 def PLL(conv):
     mu = 1  
-    theta = 1
+    theta = 0
     phase_error = np.zeros(len(conv))  
     output_signal = np.zeros(len(conv), dtype=np.complex128)
 
     for n in range(len(conv)):
         theta_hat = np.angle(conv[n]) 
-        #print(theta_hat)
+       #print(theta_hat)
         phase_error[n] = theta_hat - theta  
         output_signal[n] = conv[n] * np.exp(-1j * theta)  
         theta = theta + mu * phase_error[n]  
     return output_signal
-
 
 
 def TED_loop_filter(data): #ted loop filter 
@@ -65,10 +64,10 @@ def TED_loop_filter(data): #ted loop filter
     for ns in range(0,len(data)-(2*nsp),nsp):
         #real = (data.real[ns+n] - data.real[nsp+ns+n]) * data.real[n+(nsp)//2+ns]
         #imag = (data.imag[ns+n] - data.imag[nsp+ns+n]) * data.imag[n+(nsp)//2+ns]
-        real = (data.real[nsp+ns+n] - data.real[ns+n]) * data.real[n + (nsp)//2+ns]
-        imag = (data.imag[nsp+ns+n] - data.imag[ns+n] ) * data.imag[n + (nsp)//2+ns]
-        err[ns//nsp] = np.mean(real + imag)
-        #err[ns//nsp] = np.mean((np.conj(data[nsp+ns+n]) - np.conj(data[ns+n]))*(data[n + (nsp)//2+ns])) 
+        #real = (data.real[nsp+ns+n] - data.real[ns+n]) * data.real[n + (nsp)//2+ns]
+        #imag = (data.imag[nsp+ns+n] - data.imag[ns+n] ) * data.imag[n + (nsp)//2+ns]
+        #err[ns//nsp] = np.mean(real + imag)
+        err[ns//nsp] = np.mean((np.conj(data[nsp+ns+n]) - np.conj(data[ns+n]))*(data[n + (nsp)//2+ns])) 
         error = err.real[ns//nsp]
         p1 = error * K1
         p2 = p2 + p1 + error * K2
@@ -96,7 +95,6 @@ def TED_loop_filter(data): #ted loop filter
     return mass1
 
 
-
 Ted_index = TED_loop_filter(rxConvolve)
 print(Ted_index[:10])
 ### тут TED, Loop Filter ...
@@ -108,6 +106,8 @@ rxАfterTED = PLL(rxАfterTED)
 
 maxe = np.argmax(rxConvolve) % 10 # типа TED
 rxSymbols = rxConvolve[maxe::10] # типа TED
+rxSymbols = PLL(rxSymbols)
+
 
 ############
 # rxClear = ml.bpsk_synchro(rxSymbols, barkerCode, debug=False) # разворот на правильный угол по синхре
